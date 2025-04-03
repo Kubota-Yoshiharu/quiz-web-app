@@ -1,7 +1,20 @@
 const fs = require('fs');
 const path = require('path');
+const fetch = require('node-fetch');
 
-function convertMdToJson() {
+async function getWebPageTitle(url) {
+  try {
+    const response = await fetch(url);
+    const html = await response.text();
+    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/);
+    return titleMatch ? titleMatch[1].trim() : '';
+  } catch (error) {
+    console.warn(`Failed to fetch title for ${url}:`, error.message);
+    return '';
+  }
+}
+
+async function convertMdToJson() {
   try {
     // Word.mdを読み込む
     const mdContent = fs.readFileSync(path.join(__dirname, '..', 'Word.md'), 'utf8');
@@ -16,22 +29,28 @@ function convertMdToJson() {
       .filter(col => col);
     
     // データ行をオブジェクトに変換
-    const data = dataLines.map(line => {
+    const data = await Promise.all(dataLines.map(async line => {
       const values = line.split('|')
         .map(val => val.trim())
         .filter(val => val);
       
-      return columns.reduce((obj, col, index) => {
-        const value = values[index] || '';  // 値が存在しない場合は空文字列を使用
-        // 参考URLの場合は < > を取り除く
+      const obj = columns.reduce((acc, col, index) => {
+        const value = values[index] || '';
         if (col === '参考URL' && value) {
-          obj[col] = value.replace(/^<(.+)>$/, '$1');
+          acc[col] = value.replace(/^<(.+)>$/, '$1');
         } else {
-          obj[col] = value;
+          acc[col] = value;
         }
-        return obj;
+        return acc;
       }, {});
-    });
+
+      // 参考URLが存在する場合、タイトルを取得
+      if (obj['参考URL']) {
+        obj['参考URLのタイトル'] = await getWebPageTitle(obj['参考URL']);
+      }
+
+      return obj;
+    }));
     
     // JSONとして出力
     fs.writeFileSync(

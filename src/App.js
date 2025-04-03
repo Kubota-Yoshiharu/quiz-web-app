@@ -34,18 +34,14 @@ function App() {
         .filter((m) => m !== item.意味);
 
       if (otherChoices.length >= 3) {
-        const cleanUrl = item.参考URL
-          ? item.参考URL.replace(/[<>]/g, "")
-          : "#";
-        const choices = shuffle([
-          ...randomSample(otherChoices, 3),
-          item.意味,
-        ]);
+        const cleanUrl = item.参考URL ? item.参考URL.replace(/[<>]/g, "") : "#";
+        const choices = shuffle([...randomSample(otherChoices, 3), item.意味]);
         generated.push({
           question: item.英語,
           answer: item.意味,
           choices,
           referenceUrl: cleanUrl,
+          title: item.区分, // タイトルを追加
         });
       }
     });
@@ -140,6 +136,9 @@ function App() {
             {isCorrect ? "正解！" : "不正解..."}
           </p>
           <p>正解: {question.answer}</p>
+          <p>
+            <strong>分類: {question.title}</strong>
+          </p>
           <p>
             <a
               href={question.referenceUrl}

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import wordData from './Word.json';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import wordData from "./Word.json";
 
 function App() {
   const [questions, setQuestions] = useState([]);
@@ -20,7 +20,7 @@ function App() {
         categoryMap[item.区分].push(item);
       });
 
-      const validItems = wordData.filter((item) => item.英語 !== '-');
+      const validItems = wordData.filter((item) => item.英語 !== "-");
       const generated = [];
 
       validItems.forEach((item) => {
@@ -30,13 +30,18 @@ function App() {
           .filter((m) => m !== item.意味);
 
         if (otherChoices.length >= 3) {
-          const cleanUrl = item.参考URL ? item.参考URL.replace(/[<>]/g, '') : '#';
-          const choices = shuffle([...randomSample(otherChoices, 3), item.意味]);
+          const cleanUrl = item.参考URL
+            ? item.参考URL.replace(/[<>]/g, "")
+            : "#";
+          const choices = shuffle([
+            ...randomSample(otherChoices, 3),
+            item.意味,
+          ]);
           generated.push({
             question: item.英語,
             answer: item.意味,
             choices,
-            referenceUrl: cleanUrl
+            referenceUrl: cleanUrl,
           });
         }
       });
@@ -44,8 +49,13 @@ function App() {
       return shuffle(generated).slice(0, 10);
     }
 
-    function shuffle(arr) {
-      return arr.sort(() => Math.random() - 0.5);
+    function shuffle(array) {
+      const arr = array.slice(); // 元の配列を変更しないようコピー
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1)); // 0 から i の間のランダムなインデックス
+        [arr[i], arr[j]] = [arr[j], arr[i]]; // 要素を交換
+      }
+      return arr;
     }
 
     function randomSample(arr, size) {
@@ -79,7 +89,9 @@ function App() {
     return (
       <div className="App">
         <h2>結果</h2>
-        <p>スコア: {score} / {questions.length}</p>
+        <p>
+          スコア: {score} / {questions.length}
+        </p>
         <p>正答率: {((score / questions.length) * 100).toFixed(2)}%</p>
       </div>
     );
@@ -93,33 +105,35 @@ function App() {
 
   return (
     <div className="App">
-      <h2>問題 {currentQuestion + 1} / {questions.length}</h2>
+      <h2>
+        問題 {currentQuestion + 1} / {questions.length}
+      </h2>
       <p>{question.question} の意味は？</p>
       {!showFeedback ? (
         question.choices.map((choice, idx) => (
           <button
             key={idx}
             onClick={() => handleAnswer(choice)}
-            style={{ display: 'block', margin: '10px auto', width: '200px' }}
+            style={{ display: "block", margin: "10px auto", width: "200px" }}
           >
             {choice}
           </button>
         ))
       ) : (
         <div>
-          <p style={{ color: isCorrect ? 'green' : 'red', fontWeight: 'bold' }}>
-            {isCorrect ? '正解！' : '不正解...'}
+          <p style={{ color: isCorrect ? "green" : "red", fontWeight: "bold" }}>
+            {isCorrect ? "正解！" : "不正解..."}
           </p>
           <p>正解: {question.answer}</p>
           <p>
-            <a 
-              href={question.referenceUrl} 
-              target="_blank" 
+            <a
+              href={question.referenceUrl}
+              target="_blank"
               rel="noopener noreferrer"
               style={{
-                color: '#0066cc',
-                textDecoration: 'underline',
-                cursor: 'pointer'
+                color: "#0066cc",
+                textDecoration: "underline",
+                cursor: "pointer",
               }}
             >
               参考URL
@@ -127,7 +141,7 @@ function App() {
           </p>
           <button
             onClick={handleNext}
-            style={{ display: 'block', margin: '10px auto', width: '200px' }}
+            style={{ display: "block", margin: "10px auto", width: "200px" }}
           >
             次へ
           </button>

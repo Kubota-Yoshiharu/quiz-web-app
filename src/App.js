@@ -30,11 +30,13 @@ function App() {
           .filter((m) => m !== item.意味);
 
         if (otherChoices.length >= 3) {
+          const cleanUrl = item.参考URL ? item.参考URL.replace(/[<>]/g, '') : '#';
           const choices = shuffle([...randomSample(otherChoices, 3), item.意味]);
           generated.push({
             question: item.英語,
             answer: item.意味,
-            choices
+            choices,
+            referenceUrl: cleanUrl
           });
         }
       });
@@ -109,6 +111,20 @@ function App() {
             {isCorrect ? '正解！' : '不正解...'}
           </p>
           <p>正解: {question.answer}</p>
+          <p>
+            <a 
+              href={question.referenceUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                color: '#0066cc',
+                textDecoration: 'underline',
+                cursor: 'pointer'
+              }}
+            >
+              参考URL
+            </a>
+          </p>
           <button
             onClick={handleNext}
             style={{ display: 'block', margin: '10px auto', width: '200px' }}

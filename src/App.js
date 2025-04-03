@@ -42,7 +42,7 @@ function App() {
           choices,
           referenceUrl: cleanUrl,
           title: item.区分,
-          refTitle: item.参考URLのタイトル || "参考資料" // 参考URLのタイトルを追加
+          refTitle: item.参考URLのタイトル || "参考資料", // 参考URLのタイトルを追加
         });
       }
     });
@@ -140,6 +140,8 @@ function App() {
           <p>
             <strong>分類: {question.title}</strong>
           </p>
+          <br />
+          <p>{question.refTitle}</p>
           <p>
             <a
               href={question.referenceUrl}
@@ -151,9 +153,10 @@ function App() {
                 cursor: "pointer",
               }}
             >
-              {question.refTitle}
+              {question.referenceUrl}
             </a>
           </p>
+          <br />
           <button
             onClick={handleNext}
             style={{ display: "block", margin: "10px auto", width: "200px" }}

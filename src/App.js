@@ -7,6 +7,8 @@ function App() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   useEffect(() => {
     function getQuestions() {
@@ -57,11 +59,17 @@ function App() {
     if (correct) {
       setScore(score + 1);
     }
+    setIsCorrect(correct);
+    setShowFeedback(true);
+  }
+
+  function handleNext() {
     const next = currentQuestion + 1;
     if (next >= questions.length) {
       setShowResult(true);
     } else {
       setCurrentQuestion(next);
+      setShowFeedback(false);
     }
   }
 
@@ -85,15 +93,30 @@ function App() {
     <div className="App">
       <h2>問題 {currentQuestion + 1} / {questions.length}</h2>
       <p>{question.question} の意味は？</p>
-      {question.choices.map((choice, idx) => (
-        <button
-          key={idx}
-          onClick={() => handleAnswer(choice)}
-          style={{ display: 'block', margin: '10px auto', width: '200px' }}
-        >
-          {choice}
-        </button>
-      ))}
+      {!showFeedback ? (
+        question.choices.map((choice, idx) => (
+          <button
+            key={idx}
+            onClick={() => handleAnswer(choice)}
+            style={{ display: 'block', margin: '10px auto', width: '200px' }}
+          >
+            {choice}
+          </button>
+        ))
+      ) : (
+        <div>
+          <p style={{ color: isCorrect ? 'green' : 'red', fontWeight: 'bold' }}>
+            {isCorrect ? '正解！' : '不正解...'}
+          </p>
+          <p>正解: {question.answer}</p>
+          <button
+            onClick={handleNext}
+            style={{ display: 'block', margin: '10px auto', width: '200px' }}
+          >
+            次へ
+          </button>
+        </div>
+      )}
     </div>
   );
 }

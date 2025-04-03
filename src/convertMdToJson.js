@@ -28,29 +28,31 @@ async function convertMdToJson() {
       .map(col => col.trim())
       .filter(col => col);
     
-    // データ行をオブジェクトに変換
-    const data = await Promise.all(dataLines.map(async line => {
-      const values = line.split('|')
-        .map(val => val.trim())
-        .filter(val => val);
-      
-      const obj = columns.reduce((acc, col, index) => {
-        const value = values[index] || '';
-        if (col === '参考URL' && value) {
-          acc[col] = value.replace(/^<(.+)>$/, '$1');
-        } else {
-          acc[col] = value;
+    // データ行をオブジェクトに変換（セパレーター行を除外）
+    const data = await Promise.all(dataLines
+      .filter(line => !line.match(/^[\s|:-]+$/)) // セパレーター行を除外
+      .map(async line => {
+        const values = line.split('|')
+          .map(val => val.trim())
+          .filter(val => val);
+        
+        const obj = columns.reduce((acc, col, index) => {
+          const value = values[index] || '';
+          if (col === '参考URL' && value) {
+            acc[col] = value.replace(/^<(.+)>$/, '$1');
+          } else {
+            acc[col] = value;
+          }
+          return acc;
+        }, {});
+
+        // 参考URLが存在する場合、タイトルを取得
+        if (obj['参考URL']) {
+          obj['参考URLのタイトル'] = await getWebPageTitle(obj['参考URL']);
         }
-        return acc;
-      }, {});
 
-      // 参考URLが存在する場合、タイトルを取得
-      if (obj['参考URL']) {
-        obj['参考URLのタイトル'] = await getWebPageTitle(obj['参考URL']);
-      }
-
-      return obj;
-    }));
+        return obj;
+      }));
     
     // JSONとして出力
     fs.writeFileSync(

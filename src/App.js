@@ -6,7 +6,6 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
-  const [selectedChoice, setSelectedChoice] = useState('');
   const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
@@ -53,9 +52,8 @@ function App() {
     setQuestions(getQuestions());
   }, []);
 
-  function handleSubmit() {
-    if (!selectedChoice) return;
-    const correct = questions[currentQuestion].answer === selectedChoice;
+  function handleAnswer(choice) {
+    const correct = questions[currentQuestion].answer === choice;
     if (correct) {
       setScore(score + 1);
     }
@@ -65,7 +63,6 @@ function App() {
     } else {
       setCurrentQuestion(next);
     }
-    setSelectedChoice('');
   }
 
   if (showResult) {
@@ -89,18 +86,14 @@ function App() {
       <h2>問題 {currentQuestion + 1} / {questions.length}</h2>
       <p>{question.question} の意味は？</p>
       {question.choices.map((choice, idx) => (
-        <label key={idx} style={{ display: 'block' }}>
-          <input
-            type="radio"
-            name="choice"
-            value={choice}
-            checked={selectedChoice === choice}
-            onChange={(e) => setSelectedChoice(e.target.value)}
-          />
+        <button
+          key={idx}
+          onClick={() => handleAnswer(choice)}
+          style={{ display: 'block', margin: '10px auto', width: '200px' }}
+        >
           {choice}
-        </label>
+        </button>
       ))}
-      <button onClick={handleSubmit}>回答</button>
     </div>
   );
 }

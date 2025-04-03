@@ -22,7 +22,13 @@ function convertMdToJson() {
         .filter(val => val);
       
       return columns.reduce((obj, col, index) => {
-        obj[col] = values[index];
+        const value = values[index] || '';  // 値が存在しない場合は空文字列を使用
+        // 参考URLの場合は < > を取り除く
+        if (col === '参考URL' && value) {
+          obj[col] = value.replace(/^<(.+)>$/, '$1');
+        } else {
+          obj[col] = value;
+        }
         return obj;
       }, {});
     });

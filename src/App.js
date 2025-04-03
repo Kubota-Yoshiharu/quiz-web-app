@@ -41,7 +41,8 @@ function App() {
           answer: item.意味,
           choices,
           referenceUrl: cleanUrl,
-          title: item.区分, // タイトルを追加
+          title: item.区分,
+          refTitle: item.参考URLのタイトル || "参考資料" // 参考URLのタイトルを追加
         });
       }
     });
@@ -150,7 +151,7 @@ function App() {
                 cursor: "pointer",
               }}
             >
-              参考URL
+              {question.refTitle}
             </a>
           </p>
           <button

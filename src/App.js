@@ -25,26 +25,34 @@ function App() {
     });
 
     const validItems = wordData.filter((item) => item.英語 !== "-");
+    const allMeanings = validItems.map(item => item.意味);
     const generated = [];
 
     validItems.forEach((item) => {
       const sameCat = categoryMap[item.区分] || [];
-      const otherChoices = sameCat
+      let otherChoices = sameCat
         .map((i) => i.意味)
         .filter((m) => m !== item.意味);
 
-      if (otherChoices.length >= 3) {
-        const cleanUrl = item.参考URL ? item.参考URL.replace(/[<>]/g, "") : "#";
-        const choices = shuffle([...randomSample(otherChoices, 3), item.意味]);
-        generated.push({
-          question: item.英語,
-          answer: item.意味,
-          choices,
-          referenceUrl: cleanUrl,
-          title: item.区分,
-          refTitle: item.参考URLのタイトル || "参考資料", // 参考URLのタイトルを追加
-        });
+      // 同じ区分の選択肢が3つ未満の場合、他の区分から選択肢を追加
+      if (otherChoices.length < 3) {
+        const otherMeanings = allMeanings.filter(m => 
+          m !== item.意味 && !otherChoices.includes(m)
+        );
+        const additionalChoices = randomSample(otherMeanings, 3 - otherChoices.length);
+        otherChoices = [...otherChoices, ...additionalChoices];
       }
+
+      const cleanUrl = item.参考URL ? item.参考URL.replace(/[<>]/g, "") : "#";
+      const choices = shuffle([...randomSample(otherChoices, 3), item.意味]);
+      generated.push({
+        question: item.英語,
+        answer: item.意味,
+        choices,
+        referenceUrl: cleanUrl,
+        title: item.区分,
+        refTitle: item.参考URLのタイトル || "参考資料",
+      });
     });
 
     return shuffle(generated).slice(0, 10);
